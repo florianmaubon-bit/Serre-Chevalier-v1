@@ -1,0 +1,604 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Serre Chevalier Vallée</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: sticky tab bar (Le domaine / Histoire / Animations), one long column per tab. Histoire uses dated timelines per village, Animations a filterable calendar. */
+:root {
+  --bg: #f1f5f7;
+  --surface: #ffffff;
+  --fg: #12222f;
+  --muted: #4f616d;
+  --line: #d3dce2;
+  --accent: #a9680a;
+  --accent-soft: #f3e3c4;
+  --ridge: #c9d6de;
+  --ridge-far: #dde6ec;
+  --floor: #1d3447;
+  --p-green: #2f8a57;
+  --p-blue: #2a6fc1;
+  --p-red: #cc3a2f;
+  --p-black: #1a1f24;
+  --font-display: "Barlow Condensed", "Arial Narrow", Impact, sans-serif;
+  --font-body: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1923; --surface: #16242f; --fg: #e7eef2; --muted: #9bafbc;
+    --line: #293945; --accent: #e3a63c; --accent-soft: #3a2f17; --ridge: #22384a; --ridge-far: #182a38;
+    --floor: #6f93ad; --p-green: #4cb77c; --p-blue: #5b9be0; --p-red: #e5675c; --p-black: #05090c;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1923; --surface: #16242f; --fg: #e7eef2; --muted: #9bafbc;
+  --line: #293945; --accent: #e3a63c; --accent-soft: #3a2f17; --ridge: #22384a; --ridge-far: #182a38;
+  --floor: #6f93ad; --p-green: #4cb77c; --p-blue: #5b9be0; --p-red: #e5675c; --p-black: #05090c;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  padding-block: 0 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.wrap { max-width: 880px; margin: 0 auto; }
+h1, h2, h3 { font-family: var(--font-display); margin: 0; text-wrap: balance; line-height: 0.95; }
+p { margin: 0; max-width: 62ch; }
+a { color: var(--fg); text-decoration-color: var(--accent); text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.label { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+/* Top bar */
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: var(--bg); border-bottom: 2px solid var(--fg); }
+.bar .wrap { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 20px; padding-block: 10px 0; }
+.brand { font-family: var(--font-display); font-weight: 700; font-size: 24px; text-transform: uppercase; letter-spacing: 0.01em; }
+.nav { display: flex; gap: 4px; }
+.nav button { font: inherit; font-family: var(--font-display); font-size: 20px; font-weight: 600; text-transform: uppercase; background: none; color: var(--muted); border: 0; border-bottom: 4px solid transparent; padding: 6px 12px 6px; cursor: pointer; margin-bottom: -2px; }
+.nav button[aria-current="page"] { color: var(--fg); border-bottom-color: var(--accent); }
+
+/* Hero */
+.hero { padding-block: 48px 36px; display: grid; gap: 20px; }
+.hero h1 { font-size: clamp(64px, 17vw, 148px); font-weight: 700; text-transform: uppercase; letter-spacing: -0.01em; }
+.hero h1 span { display: block; color: var(--accent); }
+.hero .lede { font-size: 18px; color: var(--muted); }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0; border-top: 2px solid var(--fg); margin-top: 8px; }
+.fact { padding: 14px 16px 14px 0; border-bottom: 1px solid var(--line); }
+.fact b { display: block; font-family: var(--font-display); font-size: 44px; font-weight: 600; line-height: 1; }
+.fact small { font-size: 13px; color: var(--muted); }
+
+/* Sections */
+section { padding-block: 40px 8px; display: grid; gap: 18px; }
+section h2 { font-size: clamp(34px, 7vw, 52px); font-weight: 600; text-transform: uppercase; }
+.pagehead { padding-block: 44px 0; display: grid; gap: 14px; }
+.pagehead h1 { font-size: clamp(48px, 12vw, 96px); font-weight: 700; text-transform: uppercase; }
+.pagehead h1 span { color: var(--accent); }
+.pagehead p { color: var(--muted); font-size: 18px; }
+
+/* Valley strip */
+.strip { background: var(--surface); border: 1px solid var(--line); padding: 12px 12px 4px; overflow-x: auto; }
+.strip svg { display: block; width: 100%; min-width: 560px; height: auto; }
+.strip text { font-family: var(--font-mono); font-size: 11px; fill: var(--muted); }
+.strip .ridge { fill: var(--ridge); }
+.strip .ridge-far { fill: var(--ridge-far); }
+.strip .floor { fill: none; stroke: var(--floor); stroke-width: 2; }
+.strip .tick { stroke: var(--line); stroke-width: 1; }
+.strip .dot { fill: var(--surface); stroke: var(--floor); stroke-width: 2; }
+.strip .dot.on { fill: var(--accent); stroke: var(--accent); }
+.strip .peak { fill: var(--fg); }
+.strip .peaklabel { fill: var(--fg); font-weight: 500; }
+.strip .vname { fill: var(--fg); font-size: 12px; font-weight: 500; }
+.strip .vname.on { fill: var(--accent); }
+
+.tabs { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
+.tab { font: inherit; text-align: left; background: var(--surface); color: var(--fg); border: 1px solid var(--line); padding: 10px 12px; cursor: pointer; display: grid; gap: 2px; }
+.tab strong { font-family: var(--font-display); font-size: 22px; font-weight: 600; line-height: 1; }
+.tab .num { font-size: 12px; color: var(--muted); }
+.tab[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.vcard { border-left: 4px solid var(--accent); padding: 4px 0 4px 16px; display: grid; gap: 6px; min-height: 96px; }
+.vcard h3 { font-size: 30px; font-weight: 600; text-transform: uppercase; }
+
+/* Piste split */
+.split { display: flex; height: 44px; border: 1px solid var(--line); }
+.split div { display: flex; align-items: center; justify-content: center; color: #fff; font-family: var(--font-mono); font-size: 13px; font-weight: 500; min-width: 0; }
+.legend { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px 16px; }
+.legend div { display: flex; align-items: center; gap: 10px; font-size: 14px; }
+.legend i { width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--line); flex: none; }
+.notes { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; }
+.notes p { font-size: 15px; color: var(--muted); }
+.notes p b { color: var(--fg); font-weight: 600; }
+
+/* Prices */
+.tablewrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); }
+table { border-collapse: collapse; width: 100%; min-width: 420px; }
+th, td { text-align: left; padding: 14px 16px; border-bottom: 1px solid var(--line); }
+tr:last-child td { border-bottom: 0; }
+th { font-family: var(--font-mono); font-size: 12px; font-weight: 400; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+td.price { font-family: var(--font-display); font-size: 34px; font-weight: 600; line-height: 1; }
+.small { font-size: 14px; color: var(--muted); }
+
+/* Histoire */
+.tl { display: grid; gap: 0; border-left: 2px solid var(--line); margin-left: 4px; }
+.ev { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 12px; padding: 10px 0 10px 16px; position: relative; }
+.ev::before { content: ""; position: absolute; left: -7px; top: 18px; width: 12px; height: 12px; background: var(--bg); border: 2px solid var(--accent); border-radius: 50%; }
+.ev .yr { font-family: var(--font-display); font-size: 26px; font-weight: 600; line-height: 1.1; color: var(--accent); }
+.ev p { font-size: 15.5px; max-width: 58ch; }
+.village { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 8px 28px; padding-block: 36px; border-top: 2px solid var(--fg); align-items: start; }
+.village .ill { background: var(--surface); border: 1px solid var(--line); padding: 8px; }
+.village .ill svg { display: block; width: 100%; height: auto; }
+.village .body { display: grid; gap: 16px; min-width: 0; }
+.village h2 { font-size: clamp(34px, 7vw, 52px); }
+.village .lead { font-size: 17px; }
+.ill svg * { vector-effect: non-scaling-stroke; }
+.ill .s { fill: none; stroke: var(--fg); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.ill .a { fill: none; stroke: var(--accent); stroke-width: 2; stroke-linecap: round; }
+.ill .f { fill: var(--accent-soft); stroke: var(--fg); stroke-width: 2; stroke-linejoin: round; }
+.ill text { font-family: var(--font-mono); font-size: 10px; fill: var(--muted); }
+.stationline { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); border-top: 2px solid var(--fg); }
+.stationline div { padding: 14px 16px 14px 0; border-bottom: 1px solid var(--line); display: grid; gap: 2px; align-content: start; }
+.stationline b { font-family: var(--font-display); font-size: 40px; font-weight: 600; line-height: 1; color: var(--accent); }
+.stationline small { font-size: 14px; color: var(--muted); }
+@media (max-width: 560px) {
+  .village { grid-template-columns: minmax(0, 1fr); }
+  .village .ill { max-width: 160px; }
+  .ev { grid-template-columns: 70px minmax(0, 1fr); }
+}
+
+/* Animations */
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { font: inherit; font-size: 14px; background: var(--surface); color: var(--fg); border: 1px solid var(--line); padding: 6px 14px; cursor: pointer; }
+.chip[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); font-weight: 600; }
+.month { display: grid; gap: 0; }
+.month h3 { font-size: 34px; font-weight: 600; text-transform: uppercase; padding-bottom: 8px; border-bottom: 2px solid var(--fg); }
+.item { display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 4px 20px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+.item .when { font-family: var(--font-mono); font-size: 13px; font-variant-numeric: tabular-nums; color: var(--accent); }
+.item h4 { margin: 0; font-family: var(--font-body); font-size: 17px; font-weight: 600; line-height: 1.35; }
+.item p { font-size: 14.5px; color: var(--muted); margin-top: 2px; }
+.item .where { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.04em; color: var(--muted); margin-top: 4px; }
+.empty { padding: 24px 0; color: var(--muted); }
+@media (max-width: 560px) { .item { grid-template-columns: minmax(0, 1fr); } }
+
+footer { margin-top: 48px; padding-top: 20px; border-top: 2px solid var(--fg); display: grid; gap: 8px; }
+footer ul { margin: 0; padding-left: 18px; font-size: 14px; }
+</style>
+
+<div class="bar">
+  <div class="wrap">
+    <div class="brand">Serre Chevalier</div>
+    <nav class="nav" aria-label="Sections">
+      <button type="button" data-go="domaine" aria-current="page">Le domaine</button>
+      <button type="button" data-go="histoire">Histoire</button>
+      <button type="button" data-go="animations">Animations</button>
+    </nav>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- ===================== LE DOMAINE ===================== -->
+<div id="view-domaine" data-view>
+
+<header class="hero">
+  <div class="label">Hautes-Alpes · vallée de la Guisane</div>
+  <h1>Serre<br>Chevalier <span>Vallée</span></h1>
+  <p class="lede">Un seul domaine skiable réparti sur quatre villages, de Briançon au Monêtier-les-Bains, avec de longues descentes jusqu'aux fronts de neige et des pistes en forêt.</p>
+  <div class="facts">
+    <div class="fact"><b class="num">250 km</b><small>de pistes balisées</small></div>
+    <div class="fact"><b class="num">2 800 m</b><small>au sommet, secteur de l'Yret</small></div>
+    <div class="fact"><b class="num">82</b><small>pistes</small></div>
+    <div class="fact"><b class="num">5 déc.</b><small>ouverture 2026, jusqu'au 18 avril 2027</small></div>
+  </div>
+</header>
+
+<section id="villages">
+  <h2>Quatre villages, une vallée</h2>
+  <p>Chaque village a son propre front de neige. Ils sont placés ci-dessous à leur vraie altitude, de 1 200 m à Briançon jusqu'à 1 500 m au Monêtier.</p>
+
+  <div class="strip">
+    <svg viewBox="0 0 720 270" role="img" aria-label="Profil schématique de la vallée avec les altitudes des quatre fronts de neige et du sommet à 2 800 mètres">
+      <line class="tick" x1="40" x2="720" y1="50" y2="50"/>
+      <line class="tick" x1="40" x2="720" y1="135" y2="135"/>
+      <line class="tick" x1="40" x2="720" y1="219" y2="219"/>
+      <text x="0" y="54">2800</text>
+      <text x="0" y="139">2000</text>
+      <text x="0" y="223">1200</text>
+      <path class="ridge-far" d="M40 270 L40 130 L90 96 L140 110 L200 80 L260 100 L330 70 L400 105 L470 90 L540 125 L620 110 L720 140 L720 270 Z"/>
+      <path class="ridge" d="M40 270 L40 120 L80 100 L120 50 L170 90 L230 72 L300 112 L360 96 L420 132 L500 122 L560 152 L640 162 L720 172 L720 270 Z"/>
+      <path class="floor" d="M40 186 L130 187 L300 198 L450 203 L620 219 L720 224"/>
+      <polygon class="peak" points="120,50 114,60 126,60"/>
+      <text class="peaklabel" x="134" y="46">Yret · 2 800 m</text>
+      <g id="dots">
+        <circle class="dot" data-i="0" cx="130" cy="187" r="7"/>
+        <circle class="dot" data-i="1" cx="300" cy="198" r="7"/>
+        <circle class="dot" data-i="2" cx="450" cy="203" r="7"/>
+        <circle class="dot" data-i="3" cx="620" cy="219" r="7"/>
+      </g>
+      <text class="vname" data-i="0" x="130" y="248" text-anchor="middle">Monêtier</text>
+      <text class="vname" data-i="1" x="300" y="248" text-anchor="middle">Villeneuve</text>
+      <text class="vname" data-i="2" x="450" y="248" text-anchor="middle">Chantemerle</text>
+      <text class="vname" data-i="3" x="620" y="248" text-anchor="middle">Briançon</text>
+    </svg>
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+  <div class="vcard" id="vcard" aria-live="polite"></div>
+</section>
+
+<section id="domaine">
+  <h2>Le domaine</h2>
+  <p>82 pistes réparties sur environ 410 hectares. Les pistes bleues et rouges forment l'essentiel du domaine, avec 13 noires pour les skieurs qui veulent monter en niveau.</p>
+  <div class="split" role="img" aria-label="Répartition des pistes : 15 vertes, 26 bleues, 28 rouges, 13 noires">
+    <div style="flex:15; background:var(--p-green)">15</div>
+    <div style="flex:26; background:var(--p-blue)">26</div>
+    <div style="flex:28; background:var(--p-red)">28</div>
+    <div style="flex:13; background:var(--p-black)">13</div>
+  </div>
+  <div class="legend">
+    <div><i style="background:var(--p-green)"></i>Vertes</div>
+    <div><i style="background:var(--p-blue)"></i>Bleues</div>
+    <div><i style="background:var(--p-red)"></i>Rouges</div>
+    <div><i style="background:var(--p-black)"></i>Noires</div>
+  </div>
+  <div class="notes">
+    <p><b>Altitude.</b> Environ 80 % de la surface skiable est au-dessus de 1 800 m. La neige de culture couvre à peu près un tiers du domaine.</p>
+    <p><b>Un domaine étiré.</b> Traverser toute la vallée prend du temps. On organise plutôt ses journées par secteur, sans repasser par les mêmes remontées.</p>
+    <p><b>Hors ski alpin.</b> Environ 35 à 40 km de pistes de fond et 20 km d'itinéraires de raquettes, avec le parc national des Écrins à proximité.</p>
+  </div>
+</section>
+
+<section id="forfaits">
+  <h2>Forfaits 2026/27</h2>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th scope="col">Forfait journée</th><th scope="col">Âge</th><th scope="col">Tarif</th></tr></thead>
+      <tbody>
+        <tr><td>Enfant</td><td class="num">6 à 11 ans</td><td class="price">56 €</td></tr>
+        <tr><td>Adulte</td><td class="num">12 à 64 ans</td><td class="price">68 €</td></tr>
+        <tr><td>Senior</td><td class="num">65 à 74 ans</td><td class="price">62 €</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="small">Tarifs relevés le 14 septembre 2026. Ils peuvent évoluer en cours de saison. Des forfaits court séjour, semaine et saison existent aussi, vérifiez-les auprès de la station avant de réserver.</p>
+</section>
+
+<footer>
+  <div class="label">Sources</div>
+  <ul>
+    <li><a href="https://www.skiinfo.fr/alpes-du-sud/serre-chevalier/forfaits-de-ski-saison.html" target="_blank" rel="noopener">Skiinfo, forfaits de ski Serre Chevalier 2026/27</a></li>
+    <li><a href="https://guide-ski.fr/?p=8691" target="_blank" rel="noopener">Guide Ski, Serre Chevalier 2026-2027</a></li>
+    <li><a href="https://www.ski-planet.com/fr/location-serre-chevalier.html" target="_blank" rel="noopener">Ski-Planet, location Serre Chevalier</a></li>
+  </ul>
+  <p class="small">Les chiffres du domaine (nombre de pistes, remontées) varient légèrement d'une source à l'autre. Dates d'ouverture annoncées pour 2026-2027 : 5 décembre au 18 avril.</p>
+</footer>
+
+</div>
+
+<!-- ===================== HISTOIRE ===================== -->
+<div id="view-histoire" data-view hidden>
+
+<header class="pagehead">
+  <div class="label">De la charte de 1343 aux 250 km de pistes</div>
+  <h1>Histoire de la <span>vallée</span></h1>
+  <p>La station est récente, la vallée ne l'est pas. Quatre villages aux histoires très différentes se sont retrouvés sous un même nom de station en l'espace de quelques décennies.</p>
+</header>
+
+<section>
+  <h2>La station en cinq dates</h2>
+  <div class="stationline">
+    <div><b class="num">1940</b><small>Construction du téléphérique de Chantemerle</small></div>
+    <div><b class="num">1968</b><small>Le nom Serre Chevalier est adopté définitivement</small></div>
+    <div><b class="num">1971</b><small>La commune reprend la gestion du domaine et investit</small></div>
+    <div><b class="num">1984</b><small>Naissance du Grand Serre Chevalier avec le Monêtier</small></div>
+    <div><b class="num">1990</b><small>Le domaine de Briançon rejoint l'ensemble</small></div>
+  </div>
+</section>
+
+<!-- Briançon -->
+<article class="village" id="h-briancon">
+  <div class="ill">
+    <svg viewBox="0 0 160 120" role="img" aria-label="Plan en étoile d'une place forte bastionnée">
+      <circle class="a" cx="80" cy="60" r="56" stroke-dasharray="3 5"/>
+      <polygon class="f" points="80,10 95.3,39 127.6,44.5 104.7,68 109.4,100.5 80,86 50.6,100.5 55.3,68 32.4,44.5 64.7,39"/>
+      <circle class="s" cx="80" cy="60" r="10"/>
+      <text x="80" y="116" text-anchor="middle">plan bastionné</text>
+    </svg>
+  </div>
+  <div class="body">
+    <div>
+      <div class="label">Front de neige · 1 200 m</div>
+      <h2>Briançon</h2>
+    </div>
+    <p class="lead">Une ville à 1 326 m d'altitude, au point de rencontre de trois grandes vallées du Haut-Dauphiné. Elle a été la capitale d'une petite république montagnarde avant de devenir une place forte du royaume.</p>
+    <div class="tl">
+      <div class="ev"><span class="yr num">1244</span><p>Le comte Guigues VII de Viennois accorde aux habitants de Briançon une charte de liberté.</p></div>
+      <div class="ev"><span class="yr num">1343</span><p>Le 29 mai, son successeur Humbert II confirme cette charte comme Grande Charte, signée avec 18 représentants des vallées. Elle fonde la république des Escartons, qui réunit cinq vallées autour du mont Viso et dont Briançon est la capitale.</p></div>
+      <div class="ev"><span class="yr num">1692</span><p>Une attaque de l'armée de Savoie fait craindre pour la ville. Le 21 novembre, Vauban rédige son projet pour renforcer la ville et son château. L'assaut redouté n'aura jamais lieu.</p></div>
+      <div class="ev"><span class="yr num">1713</span><p>Le traité d'Utrecht déplace la frontière sur la crête du Montgenèvre. Briançon devient une ville de frontière à protéger de près.</p></div>
+      <div class="ev"><span class="yr num">1721</span><p>Début d'une ligne de forts autour de la ville, menée pendant treize étés sous la direction du maréchal d'Asfeld. Le fort des Trois-Têtes, le Randouillet et le fort Dauphin en font partie.</p></div>
+      <div class="ev"><span class="yr num">1729</span><p>Construction du pont d'Asfeld, jusqu'en 1731 : une seule arche d'environ 60 m de haut au-dessus des gorges de la Durance, qui relie la ville haute au fort des Trois-Têtes.</p></div>
+      <div class="ev"><span class="yr num">1789</span><p>Le 4 août, la république des Escartons s'éteint pour les territoires restés français.</p></div>
+      <div class="ev"><span class="yr num">2008</span><p>Les fortifications de Vauban à Briançon entrent au patrimoine mondial de l'UNESCO.</p></div>
+    </div>
+  </div>
+</article>
+
+<!-- Chantemerle -->
+<article class="village" id="h-chantemerle">
+  <div class="ill">
+    <svg viewBox="0 0 160 120" role="img" aria-label="Téléphérique suspendu à son câble entre deux pylônes">
+      <line class="s" x1="8" y1="106" x2="152" y2="106"/>
+      <line class="s" x1="50" y1="82" x2="50" y2="106"/>
+      <line class="s" x1="110" y1="42" x2="110" y2="106"/>
+      <line class="a" x1="20" y1="94" x2="145" y2="14"/>
+      <line class="s" x1="80" y1="59" x2="80" y2="68"/>
+      <rect class="f" x="69" y="68" width="22" height="16" rx="2"/>
+      <text x="80" y="118" text-anchor="middle">télépherique, 1940</text>
+    </svg>
+  </div>
+  <div class="body">
+    <div>
+      <div class="label">Front de neige · 1 350 m</div>
+      <h2>Chantemerle</h2>
+    </div>
+    <p class="lead">Chantemerle était un hameau du bord de la Guisane, rattaché à la commune de Saint-Chaffrey, dont les habitants vivaient surtout de l'agriculture de montagne. Le ski est arrivé avec un câble.</p>
+    <div class="tl">
+      <div class="ev"><span class="yr num">1940</span><p>Tout bascule avec la construction du téléphérique, longtemps l'un des plus longs d'Europe.</p></div>
+      <div class="ev"><span class="yr num">1968</span><p>Saint-Chaffrey compte alors 831 habitants. La commune regroupe Saint-Chaffrey, Chantemerle, Villard-Laté et La Gérarde.</p></div>
+      <div class="ev"><span class="yr num">1971</span><p>La commune prend la gestion du domaine skiable et y investit lourdement.</p></div>
+      <div class="ev"><span class="yr num">2007</span><p>La population atteint son maximum avec 1 689 habitants. Elle redescend ensuite à 1 494 en 2023.</p></div>
+    </div>
+  </div>
+</article>
+
+<!-- Villeneuve -->
+<article class="village" id="h-villeneuve">
+  <div class="ill">
+    <svg viewBox="0 0 160 120" role="img" aria-label="Cadran solaire avec ses douze repères horaires">
+      <circle class="s" cx="80" cy="60" r="48"/>
+      <g class="s">
+        <line x1="80" y1="16" x2="80" y2="26"/>
+        <line x1="80" y1="16" x2="80" y2="26" transform="rotate(30 80 60)"/>
+        <line x1="80" y1="16" x2="80" y2="26" transform="rotate(60 80 60)"/>
+        <line x1="80" y1="16" x2="80" y2="26" transform="rotate(90 80 60)"/>
+        <line x1="80" y1="16" x2="80" y2="26" transform="rotate(120 80 60)"/>
+        <line x1="80" y1="16" x2="80" y2="26" transform="rotate(150 80 60)"/>
+        <line x1="80" y1="16" x2="80" y2="26" transform="rotate(180 80 60)"/>
+        <line x1="80" y1="16" x2="80" y2="26" transform="rotate(210 80 60)"/>
+        <line x1="80" y1="16" x2="80" y2="26" transform="rotate(240 80 60)"/>
+        <line x1="80" y1="16" x2="80" y2="26" transform="rotate(270 80 60)"/>
+        <line x1="80" y1="16" x2="80" y2="26" transform="rotate(300 80 60)"/>
+        <line x1="80" y1="16" x2="80" y2="26" transform="rotate(330 80 60)"/>
+      </g>
+      <polygon class="f" points="80,60 80,34 96,60"/>
+      <text x="80" y="118" text-anchor="middle">cadrans solaires</text>
+    </svg>
+  </div>
+  <div class="body">
+    <div>
+      <div class="label">Front de neige · 1 400 m</div>
+      <h2>Villeneuve</h2>
+    </div>
+    <p class="lead">Villeneuve fait partie de la commune de La Salle-les-Alpes. C'est aujourd'hui le point central du domaine, mais son histoire est d'abord celle d'un fief delphinal.</p>
+    <div class="tl">
+      <div class="ev"><span class="yr num">VIIIe s.</span><p>La paroisse aurait été créée par des moines d'Oulx, ou peut-être de la Novalaise.</p></div>
+      <div class="ev"><span class="yr num">XIe s.</span><p>La Salle fait partie du fief du Dauphin. Le nom viendrait d'un mot germanique qui désigne une salle ou une maison.</p></div>
+      <div class="ev"><span class="yr num">1226</span><p>Par des actes de 1226 puis de 1232, le Dauphin constitue en faveur de la famille Bérard un grand fief, le « Fonds des Bérards ». Il comprend La Salle et les monts Granon, Oule, Longuet et Roche Gautier.</p></div>
+      <div class="ev"><span class="yr num">XVIe s.</span><p>Après les Bérard puis les Bermond, la communauté rachète les droits féodaux qu'elle payait et devient libre. Le village porte encore les armes de la famille Bérard.</p></div>
+    </div>
+  </div>
+</article>
+
+<!-- Monêtier -->
+<article class="village" id="h-monetier">
+  <div class="ill">
+    <svg viewBox="0 0 160 120" role="img" aria-label="Bassin thermal avec de la vapeur et deux températures, 34 et 38 degrés">
+      <path class="a" d="M50 62 C42 52 58 46 50 34 C44 26 54 20 50 12"/>
+      <path class="a" d="M80 62 C72 52 88 46 80 34 C74 26 84 20 80 12"/>
+      <path class="a" d="M110 62 C102 52 118 46 110 34 C104 26 114 20 110 12"/>
+      <rect class="f" x="24" y="68" width="112" height="30" rx="3"/>
+      <line class="s" x1="80" y1="68" x2="80" y2="98"/>
+      <text x="52" y="87" text-anchor="middle">34 °C</text>
+      <text x="108" y="87" text-anchor="middle">38 °C</text>
+    </svg>
+  </div>
+  <div class="body">
+    <div>
+      <div class="label">Front de neige · 1 500 m</div>
+      <h2>Le Monêtier-les-Bains</h2>
+    </div>
+    <p class="lead">Le plus haut des quatre villages est aussi une station thermale depuis l'époque romaine, grâce à deux sources chaudes, à 34 °C et 38 °C.</p>
+    <div class="tl">
+      <div class="ev"><span class="yr num">Antiquité</span><p>Le lieu s'appelle Stabatio. Étape sur la route romaine entre Grenoble et Briançon, il est déjà connu pour ses eaux chaudes.</p></div>
+      <div class="ev"><span class="yr num">IXe s.</span><p>Un prieuré bénédictin est fondé par saint Elrade, de l'abbaye de la Novalaise. La tradition lui attribue aussi d'avoir délivré la région d'une invasion de serpents.</p></div>
+      <div class="ev"><span class="yr num">XVe-XVIIIe</span><p>Églises et chapelles sont construites dans le village et ses hameaux. Des vestiges d'anciennes fortifications subsistent.</p></div>
+      <div class="ev"><span class="yr num">1715</span><p>Début de la grande période des bains, qui dure jusqu'à la fin du XIXe siècle. Le thermalisme décline ensuite au XXe siècle.</p></div>
+      <div class="ev"><span class="yr num">1984</span><p>Le Monêtier s'unit au domaine de Chantemerle et Villeneuve pour former le Grand Serre Chevalier.</p></div>
+      <div class="ev"><span class="yr num">1996</span><p>Première de plusieurs étapes du Tour de France par le village, sur la route du col du Lautaret : 1996, 1999, 2000, 2003, 2005, 2007 et 2008.</p></div>
+      <div class="ev"><span class="yr num">1999</span><p>L'ouverture des Grands Bains relance le tourisme thermal.</p></div>
+    </div>
+  </div>
+</article>
+
+<footer>
+  <div class="label">Sources</div>
+  <ul>
+    <li><a href="https://provence-alpes-cotedazur.com/decouvrir/villes-villages-de-caractere/briancon-nature-histoire-et-couleurs/" target="_blank" rel="noopener">Provence-Alpes-Côte d'Azur, Briançon</a></li>
+    <li><a href="https://www.sites-cites.fr/app/uploads/2021/01/Laissez-vous-conter-Vauban-a-Briancon.pdf" target="_blank" rel="noopener">Laissez-vous conter Vauban à Briançon (PDF)</a></li>
+    <li><a href="https://en.wikipedia.org/wiki/Republic_of_the_Escartons" target="_blank" rel="noopener">Wikipedia, République des Escartons</a></li>
+    <li><a href="https://www.provenceweb.fr/f/hautalpe/chantemerle/chantemerle.htm" target="_blank" rel="noopener">Provenceweb, Chantemerle</a></li>
+    <li><a href="https://en.wikipedia.org/wiki/Saint-Chaffrey" target="_blank" rel="noopener">Wikipedia, Saint-Chaffrey</a></li>
+    <li><a href="https://www.serre-chevalier.com/en/resort/about-valley/salle-alpes-villeneuve" target="_blank" rel="noopener">Serre Chevalier, histoire de La Salle-les-Alpes</a></li>
+    <li><a href="https://en.wikipedia.org/wiki/Le_Mon%C3%AAtier-les-Bains" target="_blank" rel="noopener">Wikipedia, Le Monêtier-les-Bains</a></li>
+    <li><a href="https://www.beyond.fr/villages/monetierbains.html" target="_blank" rel="noopener">Beyond, Le Monêtier-les-Bains</a></li>
+    <li><a href="https://www.ski-planet.com/fr/skiset/location-materiel-ski-serre-chevalier-monetier.html" target="_blank" rel="noopener">Ski-Planet, dates de la station</a></li>
+  </ul>
+  <p class="small">Plusieurs dates médiévales sont rapportées avec prudence par les sources (par exemple l'origine de la paroisse de La Salle). Pour une publication, vérifiez-les auprès des archives locales.</p>
+</footer>
+
+</div>
+
+<!-- ===================== ANIMATIONS ===================== -->
+<div id="view-animations" data-view hidden>
+
+<header class="pagehead">
+  <div class="label">Hiver 2026-2027</div>
+  <h1>Les <span>animations</span></h1>
+  <p>Des feux d'artifice du 31 décembre au festival de fin de saison en avril, voici ce qui est annoncé dans les quatre villages.</p>
+</header>
+
+<section>
+  <div class="chips" id="chips" role="group" aria-label="Filtrer par village"></div>
+  <div id="agenda"></div>
+  <p class="small">Cette liste est partielle : le calendrier officiel est publié par pages et certaines animations ont des dates supplémentaires. Les horaires et lieux précis sont à vérifier avant de venir. Le Grand Prix Serre Chevalier, rassemblement de skieurs amateurs déguisés, a eu lieu en mars 2026, les dates 2027 n'étaient pas publiées dans les sources consultées.</p>
+</section>
+
+<footer>
+  <div class="label">Sources</div>
+  <ul>
+    <li><a href="https://www.serre-chevalier.com/en/go-out/entertainment" target="_blank" rel="noopener">Serre Chevalier, calendrier des animations</a></li>
+    <li><a href="https://provence-alpes-cotedazur.com/que-faire/sortir/toutes-les-sorties/outdoormix-winter-festival-la-salle-les-alpes-fr-6486269/" target="_blank" rel="noopener">Provence-Alpes-Côte d'Azur, Outdoormix Winter Festival</a></li>
+    <li><a href="https://www.serre-chevalier.com/en/go-out/animations/grand-prix-serre-chevalier-2026" target="_blank" rel="noopener">Serre Chevalier, Grand Prix 2026</a></li>
+  </ul>
+</footer>
+
+</div>
+
+</div>
+
+<script>
+(function () {
+  /* ---------- Navigation ---------- */
+  var views = ["domaine", "histoire", "animations"];
+  var buttons = document.querySelectorAll(".nav button");
+  function show(name) {
+    if (views.indexOf(name) < 0) name = "domaine";
+    views.forEach(function (v) { document.getElementById("view-" + v).hidden = v !== name; });
+    Array.prototype.forEach.call(buttons, function (b) {
+      if (b.getAttribute("data-go") === name) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current");
+    });
+    try { history.replaceState(null, "", "#" + name); } catch (e) {}
+    window.scrollTo(0, 0);
+  }
+  Array.prototype.forEach.call(buttons, function (b) {
+    b.addEventListener("click", function () { show(b.getAttribute("data-go")); });
+  });
+  window.addEventListener("hashchange", function () { show(location.hash.replace("#", "")); });
+
+  /* ---------- Villages (accueil) ---------- */
+  var villages = [
+    { name: "Monêtier-les-Bains", short: "Monêtier", alt: 1500, text: "Le front de neige le plus haut des quatre, au pied du secteur de l'Yret qui culmine vers 2 800 m. La vallée y touche le parc national des Écrins." },
+    { name: "Villeneuve", short: "Villeneuve", alt: 1400, text: "Commune de La Salle-les-Alpes. C'est le point central du domaine : le plus pratique pour rayonner vers tous les autres secteurs." },
+    { name: "Chantemerle", short: "Chantemerle", alt: 1350, text: "Sur la commune de Saint-Chaffrey, l'une des quatre portes d'entrée du domaine, avec des espaces pour débutants comme sur chaque entrée." },
+    { name: "Briançon", short: "Briançon", alt: 1200, text: "Le front de neige le plus bas, à l'extrémité de la vallée. Ville fortifiée par Vauban : la cité haute se visite entre deux journées de ski." }
+  ];
+  var tabs = document.getElementById("tabs");
+  var card = document.getElementById("vcard");
+  var dots = document.querySelectorAll("#dots .dot");
+  var names = document.querySelectorAll(".vname");
+
+  function select(i) {
+    var v = villages[i];
+    Array.prototype.forEach.call(tabs.children, function (b, j) { b.setAttribute("aria-pressed", j === i ? "true" : "false"); });
+    Array.prototype.forEach.call(dots, function (d, j) { d.classList.toggle("on", j === i); d.setAttribute("r", j === i ? 10 : 7); });
+    Array.prototype.forEach.call(names, function (n, j) { n.classList.toggle("on", j === i); });
+    card.innerHTML = "";
+    var h = document.createElement("h3"); h.textContent = v.name;
+    var l = document.createElement("div"); l.className = "label"; l.textContent = "Front de neige · " + v.alt.toLocaleString("fr-FR") + " m";
+    var p = document.createElement("p"); p.textContent = v.text;
+    card.appendChild(l); card.appendChild(h); card.appendChild(p);
+  }
+  villages.forEach(function (v, i) {
+    var b = document.createElement("button");
+    b.type = "button"; b.className = "tab";
+    b.innerHTML = "<strong></strong><span class='num'></span>";
+    b.querySelector("strong").textContent = v.short;
+    b.querySelector(".num").textContent = v.alt.toLocaleString("fr-FR") + " m";
+    b.addEventListener("click", function () { select(i); });
+    tabs.appendChild(b);
+  });
+  Array.prototype.forEach.call(dots, function (d, j) { d.style.cursor = "pointer"; d.addEventListener("click", function () { select(j); }); });
+  select(1);
+
+  /* ---------- Animations ---------- */
+  var VN = { b: "Briançon", c: "Saint-Chaffrey", v: "La Salle-les-Alpes", m: "Le Monêtier-les-Bains" };
+  var ALL = ["b", "c", "v", "m"];
+  var groups = [
+    { title: "Décembre 2026", items: [
+      { d: "4, 11 et 16 déc.", n: "Soirées concert d'automne au Barboteur", v: ["b"] },
+      { d: "19, 23 et 26 déc., puis 2, 6, 9 et 13 janv. et d'autres dates", n: "Soirée DJ au Royal", v: ["c"] },
+      { d: "20 déc.", n: "Jam session Bruit Blanc", v: ["b"] },
+      { d: "20 et 27 déc., 7, 14, 21 et 28 fév.", n: "Welcome Home", v: ["c", "v"] },
+      { d: "21 et 28 déc., 8, 15, 22 fév. et 1er mars", n: "Welcome Home", v: ["b", "m"] },
+      { d: "21 au 25 déc.", n: "La magie des sculptures sur neige", v: ["c"] },
+      { d: "21 et 28 déc., 4, 11, 18, 25 janv., 1er fév. et d'autres dates", n: "Découverte des cadrans solaires", v: ["v"], t: "Un fil avec l'histoire du village, qui compte de nombreux cadrans." },
+      { d: "21 et 28 déc., 8, 15, 22 fév. et 1er mars", n: "Initiation au tir de biathlon pour les enfants", v: ["m"] },
+      { d: "21 et 28 déc., 10, 17, 24 fév. et 3 mars", n: "Cours Gold : détecteur d'avalanche (DVA) et snowboard débutant", v: ["m"] },
+      { d: "31 déc.", n: "Réveillon et feux d'artifice", v: ALL, t: "Un feu d'artifice dans chacun des quatre villages." }
+    ]},
+    { title: "Janvier 2027", items: [
+      { d: "1er janv.", n: "Spectacle de magie : À la recherche d'apprentis magiciens", v: ["m"] },
+      { d: "10 janv.", n: "Alpi Serre Che, Coupe de France de ski-alpinisme individuel", v: ["m"] },
+      { d: "16 janv.", n: "Snow Rugby 2027, rugby à 5 sur neige", v: ["m"] },
+      { d: "16 et 17 janv.", n: "Serre Che Snow Trail", v: ["v"] },
+      { d: "du 16 au 22 janv.", n: "Altitude Jazz Festival, 20e édition", v: ["b"] }
+    ]},
+    { title: "Février et mars 2027", items: [
+      { d: "9 et 16 fév., 2 mars", n: "Descente aux flambeaux", v: ["c"] }
+    ]},
+    { title: "Avril 2027", items: [
+      { d: "du 2 au 4 avril", n: "Outdoormix Winter Festival", v: ["v"], t: "Première édition. Le village du festival s'installe à l'arrivée de la télécabine du Pontillas, à 2 250 m : freestyle, waterslide, snow pumptrack, DJ sets en journée et concerts le soir." }
+    ]}
+  ];
+  var chips = document.getElementById("chips");
+  var agenda = document.getElementById("agenda");
+  var filter = "all";
+  var opts = [["all", "Tous les villages"], ["b", "Briançon"], ["c", "Chantemerle"], ["v", "Villeneuve"], ["m", "Monêtier"]];
+
+  function whereText(codes) {
+    return codes.length === 4 ? "Les quatre villages" : codes.map(function (c) { return VN[c]; }).join(" · ");
+  }
+  function render() {
+    agenda.innerHTML = "";
+    var any = false;
+    groups.forEach(function (g) {
+      var list = g.items.filter(function (e) { return filter === "all" || e.v.indexOf(filter) >= 0; });
+      if (!list.length) return;
+      any = true;
+      var m = document.createElement("div"); m.className = "month";
+      var h = document.createElement("h3"); h.textContent = g.title; m.appendChild(h);
+      list.forEach(function (e) {
+        var it = document.createElement("div"); it.className = "item";
+        var w = document.createElement("div"); w.className = "when"; w.textContent = e.d;
+        var b = document.createElement("div");
+        var t = document.createElement("h4"); t.textContent = e.n; b.appendChild(t);
+        if (e.t) { var p = document.createElement("p"); p.textContent = e.t; b.appendChild(p); }
+        var wh = document.createElement("div"); wh.className = "where"; wh.textContent = whereText(e.v); b.appendChild(wh);
+        it.appendChild(w); it.appendChild(b); m.appendChild(it);
+      });
+      agenda.appendChild(m);
+    });
+    if (!any) { var e = document.createElement("div"); e.className = "empty"; e.textContent = "Aucune animation annoncée pour ce village dans les sources consultées."; agenda.appendChild(e); }
+    Array.prototype.forEach.call(chips.children, function (c) { c.setAttribute("aria-pressed", c.getAttribute("data-f") === filter ? "true" : "false"); });
+  }
+  opts.forEach(function (o) {
+    var c = document.createElement("button");
+    c.type = "button"; c.className = "chip"; c.setAttribute("data-f", o[0]); c.textContent = o[1];
+    c.addEventListener("click", function () { filter = o[0]; render(); });
+    chips.appendChild(c);
+  });
+  render();
+
+  show(location.hash.replace("#", "") || "domaine");
+})();
+</script>
+
+</body></html>
